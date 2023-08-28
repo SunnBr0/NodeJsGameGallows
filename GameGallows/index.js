@@ -1,130 +1,77 @@
-const readline = require('readline-sync')
+const { stdin, stdout } = process;
+let fs = require("fs")
+let name_txt_word = fs.readdirSync("./words_tema")
 
 const strstart = "> "
+let res = ""
+let arr = []
+let type = []
+let flag = true
 
-var difficulty_selection = `${strstart}You have three difficulties, choose one of the listed ones (fruit,animals,country)\n${strstart}`
-
-
-
-var word = {
-    fruit: ["fruit",
-        "apricot",
-        "pineapple",
-        "banana",
-        "bergamot",
-        "grape",
-        "grapefruit",
-        "pear",
-        "melon",
-        "lemon",
-        "mandarin",
-        "peach",
-        "plum",
-        "apple",
-        "lime",
-        "kiwi",
-        "fig",
-        "mango",
-        "persimmon",
-        "pomelo"],
-    animals: [
-        "bear",
-        "fox",
-        "rabbit",
-        "wolf",
-        "pig",
-        "deer",
-        "moose",
-        "donkey",
-        "buffalo",
-        "camel",
-        "giraffe",
-        "hippopotamus",
-        "zebra",
-        "elephant",
-        "horse",
-        "leopard",
-        "lion",
-        "tiger",
-        "bison",
-        "koala",
-        "hyena",
-        "panda",
-        "rhinoceros",
-        "monkey",
-        "gorilla",
-        "chimpanzee",
-        "gibbon",
-        "baboon",
-        "mouse",
-        "possum",
-        "skunk",
-        "beaver",
-        "squirrel",
-        "rat"],
-    country: ["italy","japan","china","russia","india","serbia","argentina","australia","belarus","chile",
-    "colombia",
-    "france",
-    "germany",
-    "ireland",
-    "kazakhstan",
-    "turkey",
-    "uzbekistan",
-    "slovakia",
-    "slovenia",
-    "peru",
-    "pakistan",
-    "mongolia",
-    "finland",
-    "ecuador",
-    "brazil",
-    "armenia",]
+for (let i = 0; i < name_txt_word.length; i++) {
+    type.push(name_txt_word[i].split(".txt")[0])
 }
-console.log(`${strstart}You got to the game - the gallows`)
-//var difficantly = readline.question(difficulty_selection)
+var difficulty_selection = `${strstart}Вы можете выбрать разные  жанры (${[...type]}):\n${strstart}`
+console.log(`${strstart}Вы играете в игру под названием - Виселлица`)
 
-while(difficantly != "fruit" && difficantly != "animals" && difficantly != "country"){
-    var difficantly = readline.question(difficulty_selection)
-    switch (difficantly) {
-        case "fruit":
-            gallow(10,word.fruit)
-            break;
-        case "animals":
-            gallow(7,word.animals)
-            break;
-        case "country":
-            gallow(5,word.country)
-            break;
-        default:
-            console.log('Incorrectly entered')
-            break;
+
+async function game() {
+    
+    while (flag) {
+        var difficantly = await prompt(difficulty_selection)
+        for (let i = 0; i < type.length; i++) {
+            if (difficantly === type[i]) {
+                res = fs.readFileSync(`./words_tema/${name_txt_word[i].split()}`)
+                arr.push(String(res).split(/\r\n/))
+                gallow(10, arr[0])
+                flag = false
+            }
+        }
+        if (type.indexOf(difficantly) === -1) {
+            console.log("Некоректный ввод")
+        }
     }
 }
 
+async function gallow(life, obj_word) {
+    var random = Math.floor(Math.random() * (obj_word.length))
+    var randomword = obj_word[random]
+    var nullarray = new Array(randomword.length)
+    for (let i = 0; i < randomword.length; i++) {
+        nullarray[i] = "|_|"
+    }
+    console.log(nullarray.join('') + `\nLife : ${life}`)
+    while (nullarray.join('') != randomword && life > 0) {
+        var letter = await prompt(`Введите букву ${strstart}`)
+        for (const index in randomword) {
+            if (randomword[index] == letter) {
+                var bool = randomword[index] == letter
+                nullarray[index] = letter
+            }
+        }
+        bool = bool == true ? bool = false : life--
+        console.log(nullarray.join('') + `\nЖизнь : ${life}`)
+    }
+    if (life == 0) {
+        console.log("Вы проиграли!!!:(")
+        console.log(`правильное слово : "${randomword}"`)
+        process.exit();
 
-function gallow(life,obj_word) {
-            var random = Math.floor(Math.random()*(obj_word.length))
-            var randomword = obj_word[random]
-            var nullarray = new Array(randomword.length)
-            for (let i = 0; i < randomword.length; i++) {
-                nullarray[i] = "|_|"
-            }
-            console.log(nullarray.join('')+`\nLife : ${life}`)
-            while (nullarray.join('') != randomword && life > 0 ) {
-                var letter = readline.question(`enter the letter ${strstart}`)
-                for (const index in randomword) {
-                    if (randomword[index] == letter) {
-                        var bool = randomword[index] == letter
-                        nullarray[index] = letter
-                    }
-                }
-                bool = bool == true ? bool = false : life--    
-                console.log(nullarray.join('')+`\nLife : ${life}`)
-            }
-            if(life == 0){
-                console.log("You've lost!!!:(")
-                console.log(`there was a word : "${randomword}"`)
-            } else {
-                console.log("You Win!!!!")
-            }
+    } else {
+        console.log("Вы победили,ура!!!!")
+        process.exit();
+
+    }
 }
+
+function prompt(question) {
+    return new Promise((resolve, reject) => {
+        stdin.resume();
+        stdout.write(question);
+
+        stdin.on('data', data => resolve(data.toString().trim()));
+    });
+}
+
+
+game();
