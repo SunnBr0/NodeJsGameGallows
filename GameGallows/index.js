@@ -22,7 +22,7 @@ async function game() {
         for (let i = 0; i < type.length; i++) {
             if (difficantly === type[i]) {
                 res = fs.readFileSync(`./words_tema/${name_txt_word[i].split()}`)
-                arr.push(String(res).split(/\r\n/))
+                arr.push(String(res).split(/\r|\n/))
                 gallow(10, arr[0])
                 flag = false
             }
