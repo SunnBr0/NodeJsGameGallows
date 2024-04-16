@@ -25,7 +25,7 @@ cd GameGallows
 ```
 и после вводим команду
 ```shell
-node ./index.js
+npm start
 ```
 
 
